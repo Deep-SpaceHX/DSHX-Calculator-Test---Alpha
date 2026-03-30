@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate courier service rewards with the DSHX Courier Calculator for Blockade Runners, Deep Space Transports, and Freighters.">
+    <title>DSHX Courier Calculator - Ship Class Rewards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #FFFFFF;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(90deg, #0f3460 0%, #16213e 100%);
+            border-bottom: 3px solid #FFC107;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        header img {
+            max-width: 80px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #FFC107;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(255, 193, 7, 0.3);
+        }
+
+        .tagline {
+            color: #E0E0E0;
+            font-size: 0.95rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        header nav {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        header nav a {
+            color: #FFC107;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        header nav a:hover {
+            color: #FFD54F;
+        }
+
+        header nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #FFC107;
+            transition: width 0.3s ease;
+        }
+
+        header nav a:hover::after {
+            width: 100%;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .ship-classes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .ship-card {
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            border: 2px solid #FFC107;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(255, 193, 7, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ship-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FFC107, #FFD54F, #FFC107);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .ship-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(255, 193, 7, 0.25);
+        }
+
+        .ship-class-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .ship-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FFC107, #FFD54F);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 28px;
+        }
+
+        .ship-info h2 {
+            color: #FFC107;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .ship-specs {
+            font-size: 0.85rem;
+            color: #B0BEC5;
+            margin-top: 5px;
+        }
+
+        .ship-specs-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+        }
+
+        .max-cargo {
+            color: #FFC107;
+            font-weight: bold;
+        }
+
+        .security-zones {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .zone {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .zone.lowsec {
+            background: #FF6B6B;
+            color: #FFFFFF;
+        }
+
+        .zone.nullsec {
+            background: #FF4757;
+            color: #FFFFFF;
+        }
+
+        .zone.highsec {
+            background: #2ED573;
+            color: #FFFFFF;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #E0E0E0;
+            font-size: 0.95rem;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 193, 7, 0.05);
+            border: 1.5px solid #FFC107;
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]::placeholder,
+        select {
+            color: #B0BEC5;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #FFD54F;
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        select option {
+            background: #16213e;
+            color: #FFFFFF;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #FFC107, transparent);
+            margin: 20px 0;
+        }
+
+        .discount-section {
+            background: rgba(255, 193, 7, 0.05);
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .discount-section label {
+            margin-bottom: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #FFC107, #FFD54F);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05));
+            border: 2px solid #FFC107;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-label {
+            color: #B0BEC5;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            color: #FFC107;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(255, 193, 7, 0.3);
+        }
+
+        .discount-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .discount-success {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ED573;
+            border: 1px solid #2ED573;
+        }
+
+        .discount-fail {
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+            border: 1px solid #FF6B6B;
+        }
+
+        .disclaimer {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #90CAF9;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+            border: 1px solid #FF6B6B;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(90deg, #0f3460 0%, #16213e 100%);
+            border-top: 3px solid #FFC107;
+            margin-top: 60px;
+            color: #E0E0E0;
+        }
+
+        .footer-text {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+
+        .footer-accent {
+            color: #FFC107;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            header nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .ship-classes-container {
+                grid-template-columns: 1fr;
+            }
+
+            .result-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="DSHX Logo">
+        <h1>⚡ DSHX Courier Calculator</h1>
+        <p class="tagline">Deep Space Hauling Express - Courier Reward Estimator</p>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About Us</a>
+            <a href="services.html">Services</a>
+            <a href="members.html">Members</a>
+            <a href="recruitment.html">Recruitment</a>
+            <a href="quarterly-hauling.html">Quarterly Hauling</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="pilot-testimonials.html">Pilot Testimonials</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="ship-classes-container">
+            <!-- BLOCKADE RUNNER -->
+            <div class="ship-card">
+                <div class="ship-class-header">
+                    <div class="ship-icon">🚀</div>
+                    <div class="ship-info">
+                        <h2>Blockade Runner</h2>
+                        <div class="ship-specs">
+                            <div class="ship-specs-item">
+                                <span>Max Cargo:</span>
+                                <span class="max-cargo">11,500 m³</span>
+                            </div>
+                        </div>
+                        <div class="security-zones">
+                            <span class="zone lowsec">Low Sec</span>
+                            <span class="zone nullsec">Null Sec</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="blockadeForm" onsubmit="event.preventDefault(); calculateReward('blockade');">
+                    <div class="form-group">
+                        <label for="blockadeJumps">Number of Jumps:</label>
+                        <input type="number" id="blockadeJumps" placeholder="Enter number of jumps" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blockadeVolume">Cargo Size (m³):</label>
+                        <input type="number" id="blockadeVolume" placeholder="Max: 11,500 m³" max="11500" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blockadeCollateral">Collateral (ISK):</label>
+                        <input type="number" id="blockadeCollateral" placeholder="Enter collateral amount" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blockadeExpedited">Expedited Delivery:</label>
+                        <select id="blockadeExpedited">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+100%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blockadeLowSec">Low Sec Involved:</label>
+                        <select id="blockadeLowSec">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+10%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blockadeNullSec">Null Sec Involved:</label>
+                        <select id="blockadeNullSec">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+20%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blockadeTip">Tip (ISK):</label>
+                        <input type="number" id="blockadeTip" placeholder="Optional tip amount" min="0">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="discount-section">
+                        <label for="blockadeTrusted">Trusted Corp/Player:</label>
+                        <select id="blockadeTrusted">
+                            <option value="">None</option>
+                            <option value="player1">Amynthia</option>
+                            <option value="player2">Art Vandolay</option>
+                            <option value="player3">Con Amarr</option>
+                            <option value="player4">Profit Okanata</option>
+                            <option value="player5">Reaper JO</option>
+                            <option value="corp1">Loyal Contracting</option>
+                        </select>
+
+                        <div style="margin-top: 12px;">
+                            <label for="blockadeCode">Secret Discount Code:</label>
+                            <input type="password" id="blockadeCode" placeholder="Enter discount code">
+                        </div>
+                    </div>
+
+                    <button type="submit">Calculate Reward</button>
+
+                    <div id="blockadeError" class="error-message"></div>
+                    <div id="blockadeDiscount" class="discount-message"></div>
+                    <div id="blockadeResult" class="result">
+                        <div class="result-label">Estimated Reward</div>
+                        <div class="result-value" id="blockadeResultValue">0 ISK</div>
+                    </div>
+
+                    <div class="disclaimer">
+                        * Estimate only. Actual costs may vary based on additional factors and agreements.
+                    </div>
+                </form>
+            </div>
+
+            <!-- DEEP SPACE TRANSPORT -->
+            <div class="ship-card">
+                <div class="ship-class-header">
+                    <div class="ship-icon">🛸</div>
+                    <div class="ship-info">
+                        <h2>Deep Space Transport</h2>
+                        <div class="ship-specs">
+                            <div class="ship-specs-item">
+                                <span>Max Cargo:</span>
+                                <span class="max-cargo">62,500 m³</span>
+                            </div>
+                        </div>
+                        <div class="security-zones">
+                            <span class="zone lowsec">Low Sec</span>
+                            <span class="zone nullsec">Null Sec</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="dstForm" onsubmit="event.preventDefault(); calculateReward('dst');">
+                    <div class="form-group">
+                        <label for="dstJumps">Number of Jumps:</label>
+                        <input type="number" id="dstJumps" placeholder="Enter number of jumps" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dstVolume">Cargo Size (m³):</label>
+                        <input type="number" id="dstVolume" placeholder="Max: 62,500 m³" max="62500" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dstCollateral">Collateral (ISK):</label>
+                        <input type="number" id="dstCollateral" placeholder="Enter collateral amount" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dstExpedited">Expedited Delivery:</label>
+                        <select id="dstExpedited">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+100%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dstLowSec">Low Sec Involved:</label>
+                        <select id="dstLowSec">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+10%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dstNullSec">Null Sec Involved:</label>
+                        <select id="dstNullSec">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+20%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dstTip">Tip (ISK):</label>
+                        <input type="number" id="dstTip" placeholder="Optional tip amount" min="0">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="discount-section">
+                        <label for="dstTrusted">Trusted Corp/Player:</label>
+                        <select id="dstTrusted">
+                            <option value="">None</option>
+                            <option value="player1">Amynthia</option>
+                            <option value="player2">Art Vandolay</option>
+                            <option value="player3">Con Amarr</option>
+                            <option value="player4">Profit Okanata</option>
+                            <option value="player5">Reaper JO</option>
+                            <option value="corp1">Loyal Contracting</option>
+                        </select>
+
+                        <div style="margin-top: 12px;">
+                            <label for="dstCode">Secret Discount Code:</label>
+                            <input type="password" id="dstCode" placeholder="Enter discount code">
+                        </div>
+                    </div>
+
+                    <button type="submit">Calculate Reward</button>
+
+                    <div id="dstError" class="error-message"></div>
+                    <div id="dstDiscount" class="discount-message"></div>
+                    <div id="dstResult" class="result">
+                        <div class="result-label">Estimated Reward</div>
+                        <div class="result-value" id="dstResultValue">0 ISK</div>
+                    </div>
+
+                    <div class="disclaimer">
+                        * Estimate only. Actual costs may vary based on additional factors and agreements.
+                    </div>
+                </form>
+            </div>
+
+            <!-- FREIGHTER -->
+            <div class="ship-card">
+                <div class="ship-class-header">
+                    <div class="ship-icon">🏢</div>
+                    <div class="ship-info">
+                        <h2>Freighter</h2>
+                        <div class="ship-specs">
+                            <div class="ship-specs-item">
+                                <span>Max Cargo:</span>
+                                <span class="max-cargo">845,000 m³</span>
+                            </div>
+                        </div>
+                        <div class="security-zones">
+                            <span class="zone highsec">High Sec Only</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="freighterForm" onsubmit="event.preventDefault(); calculateReward('freighter');">
+                    <div class="form-group">
+                        <label for="freighterJumps">Number of Jumps:</label>
+                        <input type="number" id="freighterJumps" placeholder="Enter number of jumps" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="freighterVolume">Cargo Size (m³):</label>
+                        <input type="number" id="freighterVolume" placeholder="Max: 845,000 m³" max="845000" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="freighterCollateral">Collateral (ISK):</label>
+                        <input type="number" id="freighterCollateral" placeholder="Enter collateral amount" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="freighterExpedited">Expedited Delivery:</label>
+                        <select id="freighterExpedited">
+                            <option value="no">No</option>
+                            <option value="yes">Yes (+100%)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="freighterTip">Tip (ISK):</label>
+                        <input type="number" id="freighterTip" placeholder="Optional tip amount" min="0">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="discount-section">
+                        <label for="freighterTrusted">Trusted Corp/Player:</label>
+                        <select id="freighterTrusted">
+                            <option value="">None</option>
+                            <option value="player1">Amynthia</option>
+                            <option value="player2">Art Vandolay</option>
+                            <option value="player3">Con Amarr</option>
+                            <option value="player4">Profit Okanata</option>
+                            <option value="player5">Reaper JO</option>
+                            <option value="corp1">Loyal Contracting</option>
+                        </select>
+
+                        <div style="margin-top: 12px;">
+                            <label for="freighterCode">Secret Discount Code:</label>
+                            <input type="password" id="freighterCode" placeholder="Enter discount code">
+                        </div>
+                    </div>
+
+                    <button type="submit">Calculate Reward</button>
+
+                    <div id="freighterError" class="error-message"></div>
+                    <div id="freighterDiscount" class="discount-message"></div>
+                    <div id="freighterResult" class="result">
+                        <div class="result-label">Estimated Reward</div>
+                        <div class="result-value" id="freighterResultValue">0 ISK</div>
+                    </div>
+
+                    <div class="disclaimer">
+                        * Estimate only. Actual costs may vary based on additional factors and agreements.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-text">
+            <span class="footer-accent">DSHX Courier Calculator</span> - Fast, Safe, Reliable
+        </div>
+        <div class="footer-text">Fly Safe. Deliver Smart. Profit More.</div>
+        <div class="footer-text" style="margin-top: 15px; font-size: 0.85rem;">
+            © 2026 Deep Space Hauling Express | All Rights Reserved
+        </div>
+    </footer>
+
+    <script>
+        // Map trusted entity to its secret code and discount percent
+        const trustedDiscounts = {
+            "player1": { code: "Amynthia2!", discount: 0.02 }, // 2% discount
+            "player2": { code: "VanDolay10!", discount: 0.10 }, // 10% discount
+            "player3": { code: "Camarr!", discount: 0.05 }, // 5% discount
+            "player4": { code: "PROFIT10!", discount: 0.02 }, // 2% discount
+            "player5": { code: "Reaper!", discount: 0.05 }, // 5% discount
+            "corp1": { code: "Loyal10!", discount: 0.10 }  // 10% discount
+        };
+
+        // Ship configuration with max cargo and allowed security zones
+        const shipConfig = {
+            blockade: {
+                maxCargo: 11500,
+                maxReward: 150_000_000,
+                securityZones: ['lowSec', 'nullSec'],
+                prefixes: {
+                    jumps: 'blockadeJumps',
+                    volume: 'blockadeVolume',
+                    collateral: 'blockadeCollateral',
+                    expedited: 'blockadeExpedited',
+                    lowSec: 'blockadeLowSec',
+                    nullSec: 'blockadeNullSec',
+                    tip: 'blockadeTip',
+                    trusted: 'blockadeTrusted',
+                    code: 'blockadeCode',
+                    error: 'blockadeError',
+                    discount: 'blockadeDiscount',
+                    result: 'blockadeResult',
+                    resultValue: 'blockadeResultValue'
+                }
+            },
+            dst: {
+                maxCargo: 62500,
+                maxReward: 150_000_000,
+                securityZones: ['lowSec', 'nullSec'],
+                prefixes: {
+                    jumps: 'dstJumps',
+                    volume: 'dstVolume',
+                    collateral: 'dstCollateral',
+                    expedited: 'dstExpedited',
+                    lowSec: 'dstLowSec',
+                    nullSec: 'dstNullSec',
+                    tip: 'dstTip',
+                    trusted: 'dstTrusted',
+                    code: 'dstCode',
+                    error: 'dstError',
+                    discount: 'dstDiscount',
+                    result: 'dstResult',
+                    resultValue: 'dstResultValue'
+                }
+            },
+            freighter: {
+                maxCargo: 845000,
+                maxReward: 150_000_000,
+                securityZones: ['highSec'],
+                prefixes: {
+                    jumps: 'freighterJumps',
+                    volume: 'freighterVolume',
+                    collateral: 'freighterCollateral',
+                    expedited: 'freighterExpedited',
+                    tip: 'freighterTip',
+                    trusted: 'freighterTrusted',
+                    code: 'freighterCode',
+                    error: 'freighterError',
+                    discount: 'freighterDiscount',
+                    result: 'freighterResult',
+                    resultValue: 'freighterResultValue'
+                }
+            }
+        };
+
+        function calculateReward(shipType) {
+            const config = shipConfig[shipType];
+            const p = config.prefixes;
+
+            // Get input values
+            const jumps = parseFloat(document.getElementById(p.jumps).value);
+            const volume = parseFloat(document.getElementById(p.volume).value);
+            const collateral = parseFloat(document.getElementById(p.collateral).value);
+            const expedited = document.getElementById(p.expedited).value === 'yes';
+            let tip = parseFloat(document.getElementById(p.tip).value) || 0;
+
+            // Security zones
+            let lowSec = false, nullSec = false;
+            if (config.securityZones.includes('lowSec')) {
+                lowSec = document.getElementById(p.lowSec).value === 'yes';
+            }
+            if (config.securityZones.includes('nullSec')) {
+                nullSec = document.getElementById(p.nullSec).value === 'yes';
+            }
+
+            // Trusted & discount
+            const trusted = document.getElementById(p.trusted).value;
+            const code = document.getElementById(p.code).value.trim();
+            const errorEl = document.getElementById(p.error);
+            const discountEl = document.getElementById(p.discount);
+            const resultEl = document.getElementById(p.result);
+
+            // Clear previous messages
+            errorEl.classList.remove('show');
+            discountEl.textContent = '';
+            resultEl.classList.remove('show');
+
+            // Validation
+            if (isNaN(jumps) || isNaN(volume) || isNaN(collateral) || jumps <= 0 || volume <= 0 || collateral <= 0) {
+                errorEl.textContent = '❌ Please enter valid numbers for all required fields.';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            if (volume > config.maxCargo) {
+                errorEl.textContent = `❌ Cargo exceeds maximum of ${config.maxCargo.toLocaleString()} m³ for this ship class.`;
+                errorEl.classList.add('show');
+                return;
+            }
+
+            // Calculate reward using tiered system
+            let perJumpReward = 0;
+            if (collateral < 1e9) {
+                perJumpReward = 850000;
+            } else if (collateral < 2e9) {
+                perJumpReward = 1000000;
+            } else if (collateral < 3e9) {
+                perJumpReward = 2000000;
+            } else if (collateral < 4e9) {
+                perJumpReward = 3000000;
+            } else if (collateral < 5e9) {
+                perJumpReward = 4000000;
+            } else if (collateral < 6e9) {
+                perJumpReward = 5000000;
+            } else if (collateral < 7e9) {
+                perJumpReward = 6000000;
+            } else if (collateral < 8e9) {
+                perJumpReward = 7000000;
+            } else if (collateral < 9e9) {
+                perJumpReward = 8000000;
+            } else if (collateral < 10e9) {
+                perJumpReward = 9000000;
+            } else {
+                perJumpReward = 10000000;
+            }
+
+            let baseReward = perJumpReward * jumps;
+
+            // Apply multipliers
+            let multiplier = 1;
+            if (expedited) multiplier *= 2.0;
+            if (lowSec) multiplier *= 1.10;
+            if (nullSec) multiplier *= 1.20;
+
+            let reward = baseReward * multiplier;
+
+            // Apply discount if code matches
+            let discount = 0;
+            if (trusted && trustedDiscounts[trusted]) {
+                if (code && code === trustedDiscounts[trusted].code) {
+                    discount = trustedDiscounts[trusted].discount;
+                    reward = reward * (1 - discount);
+                    discountEl.textContent = `✓ Discount applied: ${(discount * 100).toFixed(0)}% off!`;
+                    discountEl.classList.add('discount-success');
+                } else if (code) {
+                    discountEl.textContent = `✗ Invalid secret code for selected corp/player.`;
+                    discountEl.classList.add('discount-fail');
+                }
+            }
+
+            // Add tip
+            reward += tip;
+
+            // Cap reward
+            if (reward > config.maxReward) reward = config.maxReward;
+
+            // Display result
+            document.getElementById(p.resultValue).textContent = Math.round(reward).toLocaleString() + ' ISK';
+            resultEl.classList.add('show');
+        }
+    </script>
+</body>
+</html>
