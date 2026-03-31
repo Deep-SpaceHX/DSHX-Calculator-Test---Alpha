@@ -23,12 +23,19 @@
             background: linear-gradient(90deg, #0f3460 0%, #16213e 100%);
             border-bottom: 2px solid #FFC107;
             padding: 12px 20px;
-            text-align: center;
             position: relative;
             min-height: 80px;
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-content {
+            display: flex;
             flex-direction: column;
             justify-content: center;
+            flex: 1;
+            text-align: center;
         }
 
         h1 {
@@ -44,9 +51,6 @@
         }
 
         .corp-status {
-            position: absolute;
-            right: 20px;
-            top: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -339,14 +343,17 @@
             h1 { font-size: 1.4rem; }
             .ship-classes-container { grid-template-columns: 1fr; }
             .result-value { font-size: 1.3rem; }
-            .corp-status { position: static; transform: none; margin-top: 8px; justify-content: center; }
+            header { flex-direction: column; justify-content: center; }
+            .corp-status { position: absolute; right: 20px; top: 12px; }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>⚡ DSHX Courier Calculator</h1>
-        <p class="tagline">Deep Space Hauling Express - Courier Reward Estimator</p>
+        <div class="header-content">
+            <h1>⚡ DSHX Courier Calculator</h1>
+            <p class="tagline">Deep Space Hauling Express - Courier Reward Estimator</p>
+        </div>
         <div class="corp-status">
             <div class="status-dot green" id="statusDot"></div>
             <div class="status-text green" id="statusText">ACTIVE</div>
