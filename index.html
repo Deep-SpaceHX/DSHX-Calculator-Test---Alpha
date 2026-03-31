@@ -24,6 +24,7 @@
             border-bottom: 2px solid #FFC107;
             padding: 12px 20px;
             text-align: center;
+            position: relative;
         }
 
         h1 {
@@ -37,6 +38,65 @@
             font-size: 0.8rem;
             letter-spacing: 0.5px;
         }
+
+        .corp-status {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 193, 7, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: glow 2s ease-in-out infinite;
+            box-shadow: 0 0 6px currentColor;
+        }
+
+        .status-dot.green {
+            background: #2ED573;
+            color: #2ED573;
+        }
+
+        .status-dot.yellow {
+            background: #FFD54F;
+            color: #FFD54F;
+        }
+
+        .status-dot.red {
+            background: #FF6B6B;
+            color: #FF6B6B;
+        }
+
+        @keyframes glow {
+            0%, 100% { 
+                box-shadow: 0 0 6px currentColor;
+                opacity: 1;
+            }
+            50% { 
+                box-shadow: 0 0 12px currentColor;
+                opacity: 0.8;
+            }
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-text.green { color: #2ED573; }
+        .status-text.yellow { color: #FFD54F; }
+        .status-text.red { color: #FF6B6B; }
 
         main {
             max-width: 1200px;
@@ -275,6 +335,7 @@
             h1 { font-size: 1.4rem; }
             .ship-classes-container { grid-template-columns: 1fr; }
             .result-value { font-size: 1.3rem; }
+            .corp-status { position: static; transform: none; margin-top: 8px; justify-content: center; }
         }
     </style>
 </head>
@@ -282,6 +343,10 @@
     <header>
         <h1>⚡ DSHX Courier Calculator</h1>
         <p class="tagline">Deep Space Hauling Express - Courier Reward Estimator</p>
+        <div class="corp-status">
+            <div class="status-dot green" id="statusDot"></div>
+            <div class="status-text green" id="statusText">ACTIVE</div>
+        </div>
     </header>
 
     <main>
@@ -553,6 +618,16 @@
     </footer>
 
     <script>
+        // Change corp status (you can add a dropdown or button to change this)
+        function setCorpStatus(status) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            
+            dot.className = `status-dot ${status}`;
+            text.className = `status-text ${status}`;
+            text.textContent = status.toUpperCase() === 'GREEN' ? 'ACTIVE' : status.toUpperCase() === 'YELLOW' ? 'LIMITED' : 'OFFLINE';
+        }
+
         const trustedDiscounts = {
             "player1": { code: "Amynthia2!", discount: 0.02 },
             "player2": { code: "VanDolay10!", discount: 0.10 },
