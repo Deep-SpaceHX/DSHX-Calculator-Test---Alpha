@@ -190,6 +190,7 @@
             font-size: 0.85rem;
         }
 
+        input[type="text"],
         input[type="number"] {
             width: 100%;
             padding: 10px;
@@ -200,6 +201,7 @@
             font-size: 0.9rem;
         }
 
+        input[type="text"]:focus,
         input[type="number"]:focus {
             outline: none;
             border-color: #FFD54F;
@@ -512,14 +514,14 @@
                 <!-- Cargo Volume -->
                 <div class="form-group">
                     <label>Cargo (m³):</label>
-                    <input type="number" id="volume" placeholder="30000" min="1" required>
+                    <input type="text" id="volume" placeholder="30,000" required>
                     <div style="color: #90CAF9; font-size: 0.75rem; margin-top: 3px;" id="cargoInfo"></div>
                 </div>
 
                 <!-- Collateral -->
                 <div class="form-group">
                     <label>Collateral (ISK):</label>
-                    <input type="number" id="collateral" placeholder="1000000000" min="1" required>
+                    <input type="text" id="collateral" placeholder="1,000,000,000" required>
                 </div>
 
                 <!-- Security Zone Selection -->
@@ -544,7 +546,7 @@
                 <!-- Tip -->
                 <div class="form-group">
                     <label>Tip (ISK):</label>
-                    <input type="number" id="tip" placeholder="0" min="0" value="0">
+                    <input type="text" id="tip" placeholder="0" value="0">
                 </div>
 
                 <div class="divider"></div>
@@ -618,6 +620,57 @@
 
         let currentSecurityZone = 'highsec';
 
+        // Format number with commas and decimals
+        function formatNumberInput(value) {
+            // Remove all non-digit characters except decimal point
+            const cleaned = value.replace(/[^\d.]/g, '');
+            
+            // Split by decimal point
+            const parts = cleaned.split('.');
+            const integerPart = parts[0];
+            const decimalPart = parts[1] ? '.' + parts[1] : '';
+            
+            // Add commas to integer part
+            const withCommas = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            return withCommas + decimalPart;
+        }
+
+        // Parse formatted number back to numeric value
+        function parseFormattedNumber(value) {
+            return parseFloat(value.replace(/,/g, ''));
+        }
+
+        // Add input formatting listeners
+        document.getElementById('volume').addEventListener('input', function(e) {
+            const cursorPos = this.selectionStart;
+            const oldLength = this.value.length;
+            this.value = formatNumberInput(this.value);
+            const newLength = this.value.length;
+            this.selectionStart = this.selectionEnd = cursorPos + (newLength - oldLength);
+            updateCargoInfo();
+            updateShipCards();
+            calculateRewards();
+        });
+
+        document.getElementById('collateral').addEventListener('input', function(e) {
+            const cursorPos = this.selectionStart;
+            const oldLength = this.value.length;
+            this.value = formatNumberInput(this.value);
+            const newLength = this.value.length;
+            this.selectionStart = this.selectionEnd = cursorPos + (newLength - oldLength);
+            calculateRewards();
+        });
+
+        document.getElementById('tip').addEventListener('input', function(e) {
+            const cursorPos = this.selectionStart;
+            const oldLength = this.value.length;
+            this.value = formatNumberInput(this.value);
+            const newLength = this.value.length;
+            this.selectionStart = this.selectionEnd = cursorPos + (newLength - oldLength);
+            calculateRewards();
+        });
+
         function selectSecurityZone(zone) {
             currentSecurityZone = zone;
 
@@ -655,7 +708,7 @@
         }
 
         function updateShipCards() {
-            const volume = parseFloat(document.getElementById('volume').value) || 0;
+            const volume = parseFormattedNumber(document.getElementById('volume').value) || 0;
             const availableShips = getAvailableShips(volume);
 
             // Update ship card highlighting
@@ -665,7 +718,7 @@
         }
 
         function updateCargoInfo() {
-            const volume = parseFloat(document.getElementById('volume').value) || 0;
+            const volume = parseFormattedNumber(document.getElementById('volume').value) || 0;
             const cargoInfo = document.getElementById('cargoInfo');
 
             if (volume === 0) {
@@ -685,10 +738,10 @@
 
         function calculateRewards() {
             const jumps = parseFloat(document.getElementById('jumps').value);
-            const volume = parseFloat(document.getElementById('volume').value);
-            const collateral = parseFloat(document.getElementById('collateral').value);
+            const volume = parseFormattedNumber(document.getElementById('volume').value);
+            const collateral = parseFormattedNumber(document.getElementById('collateral').value);
             const expedited = document.getElementById('expedited').checked;
-            const tip = parseFloat(document.getElementById('tip').value) || 0;
+            const tip = parseFormattedNumber(document.getElementById('tip').value) || 0;
             const trusted = document.getElementById('trusted').value;
             const code = document.getElementById('code').value.trim();
             const errorEl = document.getElementById('errorMessage');
@@ -793,11 +846,6 @@
         }
 
         // Event listeners
-        document.getElementById('volume').addEventListener('input', () => {
-            updateCargoInfo();
-            updateShipCards();
-            calculateRewards();
-        });
         document.getElementById('calculatorForm').addEventListener('input', calculateRewards);
 
         // Initialize
