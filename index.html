@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSHX Courier Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>⚡ DSHX Courier Calculator</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Blockade Runner</h2>
+            <label for="blockade-weight">Weight:</label>
+            <input type="number" id="blockade-weight" placeholder="Enter weight">
+            <button onclick="calculateBlockade()">Calculate</button>
+            <p id="blockade-result"></p>
+        </section>
+        <section>
+            <h2>Deep Space Transport</h2>
+            <label for="transport-weight">Weight:</label>
+            <input type="number" id="transport-weight" placeholder="Enter weight">
+            <button onclick="calculateTransport()">Calculate</button>
+            <p id="transport-result"></p>
+        </section>
+        <section>
+            <h2>Freighter</h2>
+            <label for="freighter-weight">Weight:</label>
+            <input type="number" id="freighter-weight" placeholder="Enter weight">
+            <button onclick="calculateFreighter()">Calculate</button>
+            <p id="freighter-result"></p>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
